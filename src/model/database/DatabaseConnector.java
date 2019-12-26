@@ -16,16 +16,10 @@ public class DatabaseConnector {
 
     private static Connection connection;
 
-    public static void connect(String databasePath) {
+    public static void connect(String databasePath) throws ClassNotFoundException, SQLException {
 
-        try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(databasePath);
-        }
-        catch (ClassNotFoundException | SQLException e) {
-            System.out.println(e);
-            e.printStackTrace();
-        }
     }
 
     public static Connection getConnection() {
@@ -33,13 +27,8 @@ public class DatabaseConnector {
         return connection;
     }
 
-    public static void disconnect() {
+    public static void disconnect() throws SQLException {
 
-        try {
-            connection.close();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
+        connection.close();
     }
 }

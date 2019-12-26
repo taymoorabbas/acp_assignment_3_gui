@@ -6,27 +6,27 @@ Time: 7:11 PM
 Lau ji Ghauri aya fir
 */
 
-import model.Lecturer;
-import model.database.DatabaseConnector;
-import model.database.DatabaseConstants;
-import model.database.EmployeeDatabaseManager;
+import view.MainFrame;
 
-import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.*;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        DatabaseConnector.connect(DatabaseConstants.databasePath);
+        //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        UIManager.put("TabbedPane.selected", Color.ORANGE);
+        UIManager.put("TabbedPane.unselectedBackground", Color.GRAY);
+        //UIManager.getDefaults().put("TableHeader.cellBorder",new LineBorder(Color.BLACK));
+        //UIManager.put("Table.gridColor", new ColorUIResource(Color.WHITE));
 
-        ArrayList<Lecturer> lecturers = EmployeeDatabaseManager.getAllLecturer();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
 
-        if (lecturers != null){
-
-            for(Lecturer lecturer : lecturers){
-
-                System.out.println(lecturer.toString());
+                new MainFrame("Assignment 3");
             }
-        }
+        });
     }
 }

@@ -14,62 +14,48 @@ import model.SecurityGuard;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import static model.database.DatabaseConstants.*;
 
 public class EmployeeDatabaseManager {
 
-    private static PreparedStatement statement;
-    private static ResultSet resultSet;
-    private static String query;
+    private PreparedStatement statement;
+    private ResultSet resultSet;
+    private String query;
 
     /******************************************EMPLOYEE QUERIES********************************************************/
 
-    private static int insertEmployee(String name, int age, float salary){
+    private void insertEmployee(int id, String name, int age, float salary){
 
-        query = "INSERT INTO " + employeeTableLabel + " VALUES (?, ?, ?)";
+        query = "INSERT INTO " + employeeTableLabel + " VALUES (?, ?, ?, ?)";
 
         try {
             statement = DatabaseConnector
                     .getConnection()
-                    .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement(query);
 
-            statement.setString(1, name);
-            statement.setInt(2, age);
-            statement.setFloat(3, salary);
+            statement.setInt(1, id);
+            statement.setString(2, name);
+            statement.setInt(3, age);
+            statement.setFloat(4, salary);
 
-            if(statement.executeUpdate() != 0){
-
-                int key = -1;
-                resultSet = statement.getGeneratedKeys();
-
-                if(resultSet.next()){
-
-                    key = resultSet.getInt(1);
-                }
-                return key;
-            }
+            statement.executeUpdate();
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
         finally {
             try {
-                if (resultSet != null) {
-                    statement.close();
-                    resultSet.close();
-                }
+                statement.close();
             }
             catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return -1;
     }
 
-    public static Employee getEmployee(int employeeID){
+    private Employee getEmployee(int employeeID){
 
         Lecturer lecturer = getLecturer(employeeID);
 
@@ -165,7 +151,7 @@ public class EmployeeDatabaseManager {
         return null;
     }
 
-    public static boolean updateEmployee(int employeeID, Employee updatedEmployee){
+    public void updateEmployee(int employeeID, Employee updatedEmployee){
 
         if(updatedEmployee instanceof  Lecturer){
 
@@ -200,10 +186,9 @@ public class EmployeeDatabaseManager {
                         statement.setFloat(3, updatedLecturer.getBasicSalary());
                         statement.setInt(4,employeeID);
 
-                        return statement.executeUpdate() != 0;
+                        statement.executeUpdate();
                     }
                 }
-                return false;
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -252,10 +237,9 @@ public class EmployeeDatabaseManager {
                         statement.setFloat(3, updatedSecurityGuard.getBasicSalary());
                         statement.setInt(4, employeeID);
 
-                        return statement.executeUpdate() != 0;
+                        statement.executeUpdate();
                     }
                 }
-                return false;
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -271,18 +255,18 @@ public class EmployeeDatabaseManager {
                 }
             }
         }
-        return false;
     }
 
-    public static boolean deleteEmployee(int employeeID){
+    public void deleteEmployee(int employeeID){
+
+        System.out.println("DELETING....");
 
         query = "DELETE FROM " + employeeTableLabel + " WHERE " + employeeIdLabel + " = ?";
 
         try {
             statement = DatabaseConnector.getConnection().prepareStatement(query);
             statement.setInt(1, employeeID);
-
-            return statement.executeUpdate() != 0;
+            statement.executeUpdate();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -298,12 +282,11 @@ public class EmployeeDatabaseManager {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
     /******************************************ACADEMIC QUERIES********************************************************/
 
-    private static void insertAcademic(int academicID, float courseRate) {
+    private void insertAcademic(int academicID, float courseRate) {
 
         query = "INSERT INTO " + academicTableLabel + " VALUES (?, ?)";
 
@@ -314,6 +297,7 @@ public class EmployeeDatabaseManager {
 
             statement.setInt(1, academicID);
             statement.setFloat(2, courseRate);
+
             statement.executeUpdate();
         }
         catch (SQLException e) {
@@ -329,10 +313,11 @@ public class EmployeeDatabaseManager {
                 e.printStackTrace();
             }
         }
+
     }
 
     /******************************************NON-ACADEMIC QUERIES****************************************************/
-    private static void insertNonAcademic(int nonAcademicID, float hourlyRate) {
+    private void insertNonAcademic(int nonAcademicID, float hourlyRate) {
 
         query = "INSERT INTO " + nonAcademicTableLabel + " VALUES (?, ?)";
 
@@ -343,6 +328,7 @@ public class EmployeeDatabaseManager {
 
             statement.setInt(1, nonAcademicID);
             statement.setFloat(2, hourlyRate);
+
             statement.executeUpdate();
         }
         catch (SQLException e) {
@@ -362,21 +348,19 @@ public class EmployeeDatabaseManager {
 
     /******************************************LECTURER QUERIES********************************************************/
 
-    public static boolean addLecturer(Lecturer lecturer){
+    public void addLecturer(Lecturer lecturer){
 
-        int key = insertEmployee(lecturer.getName(), lecturer.getAge(), lecturer.getBasicSalary());
+        if(getEmployee(lecturer.getId()) != null){
 
-        if(key != 0){
-
-            insertAcademic(key, lecturer.getCourseRate());
-            insertLecturer(key, lecturer.getTotalCourses());
-
-            return true;
+            updateEmployee(lecturer.getId(), lecturer);
+            return;
         }
-        return false;
+        insertEmployee(lecturer.getId(), lecturer.getName(), lecturer.getAge(), lecturer.getBasicSalary());
+        insertAcademic(lecturer.getId(), lecturer.getCourseRate());
+        insertLecturer(lecturer.getId(), lecturer.getTotalCourses());
     }
 
-    private static void insertLecturer(int lecturerID, int totalCourses) {
+    private void insertLecturer(int lecturerID, int totalCourses) {
 
         query = "INSERT INTO " + lecturerTableLabel + " VALUES (?, ?)";
 
@@ -404,7 +388,7 @@ public class EmployeeDatabaseManager {
         }
     }
 
-    private static Lecturer getLecturer(int id) {
+    private Lecturer getLecturer(int id) {
 
         query = "SELECT * FROM " + lecturerTableLabel + " WHERE " + lecturerIdLabel + "= ?";
 
@@ -440,7 +424,7 @@ public class EmployeeDatabaseManager {
         return null;
     }
 
-    public static ArrayList<Lecturer> getAllLecturer(){
+    public ArrayList<Lecturer> getAllLecturer(){
 
         query = "SELECT " + employeeIdLabel + ",\n" +
                 employeeNameLabel + ",\n" +
@@ -489,68 +473,22 @@ public class EmployeeDatabaseManager {
         return null;
     }
 
-    public static float lecturerTotalSalary(){
-
-        query = "SELECT \n" +
-                employeeBasicSalaryLabel + ",\n" +
-                courseRateLabel + ",\n" +
-                totalCoursesLabel + "\n" +
-                "FROM\n" + employeeTableLabel + ", " + academicTableLabel + ", " + lecturerTableLabel +
-                " WHERE\n" + academicIdLabel + " = " + employeeIdLabel +
-                " AND " + lecturerIdLabel + " = " + employeeIdLabel + ";";
-
-        try {
-            statement = DatabaseConnector.getConnection().prepareStatement(query);
-            resultSet = statement.executeQuery();
-
-            if(resultSet != null){
-
-                float totalSalaries = 0;
-
-                while (resultSet.next()){
-
-                    totalSalaries += ((resultSet.getFloat(employeeBasicSalaryLabel)
-                            + resultSet.getFloat(courseRateLabel))
-                            * resultSet.getInt(totalCoursesLabel));
-                }
-
-                return totalSalaries;
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if (statement != null && resultSet != null) {
-                    statement.close();
-                    resultSet.close();
-                }
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return -1;
-    }
-
     /******************************************SECURITY GUARD QUERIES**************************************************/
 
-    public static boolean addSecurityGuard(SecurityGuard securityGuard){
+    public void addSecurityGuard(SecurityGuard securityGuard){
 
-        int key = insertEmployee(securityGuard.getName(), securityGuard.getAge(), securityGuard.getBasicSalary());
+        if(getEmployee(securityGuard.getId()) != null){
 
-        if(key != 0){
-
-            insertNonAcademic(key, securityGuard.getHourlyRate());
-            insertSecurityGuard(key, securityGuard.getTotalHours());
-
-            return true;
+            updateEmployee(securityGuard.getId(), securityGuard);
+            return;
         }
-        return false;
+        insertEmployee(securityGuard.getId(), securityGuard.getName(), securityGuard.getAge(),
+                securityGuard.getBasicSalary());
+        insertNonAcademic(securityGuard.getId(), securityGuard.getHourlyRate());
+        insertSecurityGuard(securityGuard.getId(), securityGuard.getTotalHours());
     }
 
-    private static void insertSecurityGuard(int securityGuardID, int totalHours) {
+    private void insertSecurityGuard(int securityGuardID, int totalHours) {
 
         query = "INSERT INTO " + securityGuardTableLabel + " VALUES (?, ?)";
 
@@ -578,7 +516,7 @@ public class EmployeeDatabaseManager {
         }
     }
 
-    private static SecurityGuard getSecurityGuard(int id) {
+    private SecurityGuard getSecurityGuard(int id) {
 
         query = "SELECT * FROM " + securityGuardTableLabel + " WHERE " + securityGuardIDLabel + " = ?";
 
@@ -614,7 +552,7 @@ public class EmployeeDatabaseManager {
         return null;
     }
 
-    public static ArrayList<SecurityGuard> getAllSecurityGuard(){
+    public ArrayList<SecurityGuard> getAllSecurityGuard(){
 
         query = "SELECT " + employeeIdLabel + ",\n" +
                 employeeNameLabel + ",\n" +
@@ -661,49 +599,5 @@ public class EmployeeDatabaseManager {
             }
         }
         return null;
-    }
-
-    public static float securityGuardTotalSalary(){
-
-        query = "SELECT \n" +
-                employeeBasicSalaryLabel + ",\n" +
-                hourlyRateLabel + ",\n" +
-                totalHoursLabel + "\n" +
-                "FROM\n" + employeeTableLabel + ", " + nonAcademicTableLabel + ", " + securityGuardTableLabel +
-                " WHERE\n" + nonAcademicIdLabel + " = " + employeeIdLabel +
-                " AND " + securityGuardIDLabel + " = " + employeeIdLabel + ";";
-
-        try {
-            statement = DatabaseConnector.getConnection().prepareStatement(query);
-            resultSet = statement.executeQuery();
-
-            if(resultSet != null){
-
-                float totalSalaries = 0;
-
-                while (resultSet.next()){
-
-                    totalSalaries += ((resultSet.getFloat(employeeBasicSalaryLabel)
-                            + resultSet.getFloat(hourlyRateLabel))
-                            * resultSet.getInt(totalHoursLabel));
-                }
-                return totalSalaries;
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if (statement != null && resultSet != null) {
-                    statement.close();
-                    resultSet.close();
-                }
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return -1;
     }
 }

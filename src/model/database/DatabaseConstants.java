@@ -12,7 +12,7 @@ public class DatabaseConstants {
 
     //database path
     public static final String databasePath =
-            "jdbc:sqlserver://TAYMOOR-ENVY\\SQLEXPRESS;databaseName=Employees;integratedSecurity=true";
+            "jdbc:sqlserver://TAYMOOR-ENVY\\SQLEXPRESS;databaseName=ACP;integratedSecurity=true";
 
     //table names
     public static final String employeeTableLabel = "Employee";
