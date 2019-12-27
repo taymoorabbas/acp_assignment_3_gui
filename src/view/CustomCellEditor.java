@@ -33,7 +33,16 @@ public class CustomCellEditor extends AbstractCellEditor implements TableCellEdi
                     if (!((c >= '0') && (c <= '9') ||(c == '.')||
                             (c == KeyEvent.VK_BACK_SPACE) ||
                             (c == KeyEvent.VK_DELETE))) {
+
+                        if(textField.getText().equals("0")){
+
+                            textField.setText(textField.getText().trim());
+                        }
                         e.consume();
+                    }
+                    if(textField.getText().length() == 0){
+
+                        textField.setText("0");
                     }
                 }
             });
@@ -48,6 +57,10 @@ public class CustomCellEditor extends AbstractCellEditor implements TableCellEdi
                             (c == KeyEvent.VK_BACK_SPACE) ||
                             (c == KeyEvent.VK_DELETE))) {
                         e.consume();
+                    }
+                    if(textField.getText().length() == 0){
+
+                        textField.setText("0");
                     }
                 }
             });

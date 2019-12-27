@@ -40,7 +40,7 @@ public class LecturerTablePanel extends JPanel {
         //miscellaneous
         this.table.setFont(new Font("SanSerif", Font.ITALIC|Font.BOLD, 20));
         this.table.setRowHeight(40);
-        this.table.setGridColor(Color.WHITE);
+        this.table.setGridColor(Color.BLACK);
         this.table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
         //custom table header renderer
@@ -58,8 +58,8 @@ public class LecturerTablePanel extends JPanel {
         //custom column renderer
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setHorizontalAlignment(SwingConstants.LEFT);
-        renderer.setBackground(Color.DARK_GRAY);
-        renderer.setForeground(Color.WHITE);
+        renderer.setBackground(Color.WHITE);
+        renderer.setForeground(Color.BLACK);
         for(int x = 0; x < 6; x++){
 
             table.getColumnModel().getColumn(x).setCellRenderer(renderer);

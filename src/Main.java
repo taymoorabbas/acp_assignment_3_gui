@@ -15,11 +15,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         UIManager.put("TabbedPane.selected", Color.ORANGE);
         UIManager.put("TabbedPane.unselectedBackground", Color.GRAY);
-        //UIManager.getDefaults().put("TableHeader.cellBorder",new LineBorder(Color.BLACK));
-        //UIManager.put("Table.gridColor", new ColorUIResource(Color.WHITE));
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override

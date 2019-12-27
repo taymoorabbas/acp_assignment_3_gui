@@ -20,6 +20,8 @@ import view.Interface.SalaryDialogListener;
 import view.Interface.ToolbarListener;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -234,6 +236,20 @@ public class MainFrame extends JFrame {
         tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 20));
         tabbedPane.addTab("Lecturer", lecturerTablePanel);
         tabbedPane.addTab("Security Guard", securityGuardTablePanel);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+
+                if (tabbedPane.getSelectedIndex() == LECTURER){
+
+                    lecturerTablePanel.refresh();
+                }
+                if(tabbedPane.getSelectedIndex() == SECURITY_GUARD){
+
+                    securityGuardTablePanel.refresh();
+                }
+            }
+        });
     }
 
     private void setupLecturerTablePanel(){
